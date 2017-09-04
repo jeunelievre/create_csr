@@ -7,11 +7,17 @@ if len(sys.argv) == 1:
 #vars
 csrconfigTemplate = "[req]\ndistinguished_name = req_distinguished_name\nprompt = no\n\n[req_distinguished_name]\nC={}\nST={}\nL={}\nO={}\nOU={}\nCN={}\n"
 cmdTemplate = "openssl req -new -sha256 -newkey rsa:2048 -nodes -config {} -keyout {} -out {}"
-sslPath = "/home/staff/xxx/ssl"
+sslPath = "/home/staff/r_akobzar/ssl"
 domain = sys.argv[1]
 csrconfig = sslPath + "/"+domain + ".csr-config"
 csr = sslPath + "/" + domain + ".csr"
 key= sslPath + "/" + domain + ".key"
+
+defaultCountry="RU"
+defaultState="Moscow"
+defaultCity="Moscow"
+defaultOrganization="1Gb.ru"
+defaultUnit="Head"
 
 if os.path.isfile(csrconfig):
   replace_csr = input("csr-config exists, replace? (y,n):")
@@ -20,29 +26,29 @@ if os.path.isfile(csrconfig):
   else:
     sys.exit("Exit")
 
-country = input("Enter country[RU]: ")
-state = input("Enter state[Moscow]: ")
-city = input("Enter city[Moscow]: ")
-organization = input("Enter organization[Vector]: ")
-unit = input("Enter organization unit[Head]: ")
+country = input("Enter country ["+defaultCountry+"]: ")
+state = input("Enter state ["+defaultState+"]: ")
+city = input("Enter city ["+defaultCity+"]: ")
+organization = input("Enter organization ["+defaultOrganization+"]: ")
+unit = input("Enter organization unit ["+defaultUnit+"]: ")
 
 if country == "":
-  country = "RU"
+  country = defaultCountry
 if state == "":
-  state = "Moscow"
+  state = defaultState
 if city == "":
-  city = "Moscow"
+  city = defaultCity
 if organization == "":
-  organization = "Vector"
+  organization = defaultOrganization
 if unit == "":
-  unit = "Head"
+  unit = defaultUnit
 
 csrConfig = open(csrconfig,'w+')
 csrConfig.write(csrconfigTemplate.format(country,state,city,organization,unit,domain))
 csrConfig.close()
-os.system(cmdTemplate.format(csrconfig,key,csr))
+result=os.system(cmdTemplate.format(csrconfig,key,csr))
 
-if os.path.isfile(csr):
+if result == 0:
   os.system("cat " + key)
   print()
   os.system("cat " + csr)
